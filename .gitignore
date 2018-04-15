@@ -8,3 +8,29 @@ scripts/w/*
 
 .vscode/
 .ipynb_checkpoints/
+
+
+## ignoring latex helper files
+report/*.aux
+report/*.glo
+report/*.idx
+report/*.log
+report/*.toc
+report/*.ist
+report/*.acn
+report/*.acr
+report/*.alg
+report/*.bbl
+report/*.blg
+report/*.dvi
+report/*.glg
+report/*.gls
+report/*.ilg
+report/*.ind
+report/*.lof
+report/*.lot
+report/*.maf
+report/*.mtc
+report/*.mtc1
+report/*.out
+report/*.synctex.gz
