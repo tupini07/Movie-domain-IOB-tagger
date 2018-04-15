@@ -1,0 +1,10 @@
+scripts/__pycache__/
+*.py[cod]
+*$py.class
+
+Graphics.html
+scripts/draw/*
+scripts/w/*
+
+.vscode/
+.ipynb_checkpoints/

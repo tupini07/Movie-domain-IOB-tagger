@@ -1,0 +1,17 @@
+\begin{thebibliography}{1}
+
+\bibitem{openfst}
+Openfst.org.
+\newblock \url{http://www.openfst.org/}.
+
+\bibitem{opengrm}
+Opengrm.org.
+\newblock \url{http://www.opengrm.org/}.
+
+\bibitem{DesignChallenges}
+Lev Ratinov and Dan Roth.
+\newblock Design challenges and misconceptions in named entity recognition.
+\newblock In {\em CoNLL}, pages 147--155. Association for Computational
+  Linguistics, 2009.
+
+\end{thebibliography}
