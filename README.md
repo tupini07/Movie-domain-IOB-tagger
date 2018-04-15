@@ -39,10 +39,10 @@ The first thing you need to do to run this code is installing the dependencies. 
 
 Then you need to install the following python packages:
 
-- pandas - for reading and managing score files 
-- tqdm - which provides a nice progress bar and ETA while calculating the scores
-- nltk - provides an easy wat to calculate conditional frequencies
-- seaborn - to generate the graphs used in the report
+- `pandas` - for reading and managing score files 
+- `tqdm` - which provides a nice progress bar and ETA while calculating the scores
+- `nltk` - provides an easy wat to calculate conditional frequencies
+- `seaborn` - to generate the graphs used in the report
 
 *Note: the program won't recalculate the scores for a model and it's parameters if there is already one said score file in the scores folder. The program checks the filename which is formatted as `<kind of model>_method-<method>_oder-<n-gram length>.txt` to check if a combination has already been executed. So, if you wish to recalculate the scores for a certain model you'll need to delete it's corresponding score file.*
 
