@@ -18,7 +18,7 @@ train_set, train_wrd_tag, test_set, lex = helper.preprocess_files()
 
 #? Create transducers (iob and iob_and_w)
 
-model.create_transducer_from_data([tuple(pair)  # tag - word (condition is tag)
+model.create_transducer_from_data([tuple(pair)  # word - tag (condition is tag)
                                    for sentence in train_set
                                    for pair in sentence],
                                   "iob_tagger_trans") # name of our transducer
@@ -37,22 +37,21 @@ model.create_transducer_from_data([tuple(pair)  # word - improved iob (condition
 
 ngrammake_methods = ["absolute", "katz", "kneser_ney",
                      "presmoothed", "unsmoothed", "witten_bell"]
-# "katz_frac", gives error?
 
 ngramcount_orders = ["1", "2", "3", "4", "5"]
-version = ["iob", "iob_and_w"]
+version = ["iob", "iob_and_w"] # basic and improved
 
-for kind, method, count in itertools.product(version, ngrammake_methods, ngramcount_orders):
+# iterate over all possible combinations of kind, method and count
+for kind, method, count in itertools.product(version, ngrammake_methods, ngramcount_orders): 
 
     # if score file for current pair (method, count) has already been calculated and saved to file then skip
-    # and continue with next step
+    # and continue with next combination
     if os.path.exists(f"scores/{kind}_method-{method}_order-{count}.txt"):
         continue
 
     print(
         f"Processing:\t version: {kind} \t method: {method} \t order: {count}")
 
-    # this is also in charge of concatenating ngram model + transducer
 
     if kind == "iob":  # create model with smoothing and ngram order
         model.create_iob_ngram_model(method, count)
@@ -63,7 +62,9 @@ for kind, method, count in itertools.product(version, ngrammake_methods, ngramco
     # process all test sentences with the created model
     scores.process_test_sentences(test_set, kind)
 
-    scores.process_preds_to_score(f"{kind}_method-{method}_order-{count}.txt")
+    # calculate how well the model made the predictions for the test set and save 
+    # results to a file
+    scores.process_preds_to_score(f"{kind}_method-{method}_order-{count}.txt") 
 
 
 # finally, if baseline scores haven't been calculated yet, we calculate them

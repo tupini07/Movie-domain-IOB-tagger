@@ -2,6 +2,10 @@ import model
 
 
 def preprocess_files():
+    """
+    Load the different dataset files and process them to the appropiate format: [ ... (word, tag) ... ]
+    """
+
     #? process files and create lexicon
     train_file = open("../P1_data/data/NLSPARQL.train.data",
                       "r", encoding="utf8").read()
@@ -13,9 +17,10 @@ def preprocess_files():
                   for pair in sentence.split("\n")]
                  for sentence in train_file.split("\n\n")]
 
-    def imp_extract_w_and_tag(pair):
+    def imp_extract_w_and_tag(pair): 
         """
-        For improved version
+        For improved version, the O tags are replaced with
+        O__word
         """
         word = pair[0]
         tag = pair[1]
@@ -56,14 +61,16 @@ def preprocess_files():
                  for pair in sentence.split("\n")]
                 for sentence in test_file.split("\n\n")]
 
-    test_set = [[[word if word in lex else "<unk>", tag]
+    test_set = [[[word if word in lex else "<unk>", tag] # replace any unknown words in the test set with the <unk> keyword
                  for word, tag in sentence]
                 for sentence in test_set]
 
-    # here we transform the train_set into a set of lines where each line is composed of the tags assigned to each sentence
-    # separated by a space
+    ################
+    # Create n-gram files
+    #
+    # here we write a file that for each line contains the tags in a sentence of the training set, separated by a space
+    # we will later process these files with OpenGrm to create the ngram models
     with open("w/iob_ngram_file.txt", "w") as ngram_file:
-        # content = ["<s> " + " ".join(tag for _, tag in sentence) + " </s>"
         content = [" ".join(tag for _, tag in sentence)
                    for sentence in train_set]
         content = "\n".join(content)
@@ -76,4 +83,5 @@ def preprocess_files():
         content = "\n".join(content)
         ngram_file.write(content)
 
-    return train_set, train_wrd_tag, test_set, lex
+    # finally return the processed train sets (basic and improved), test set and lexicon file
+    return train_set, train_wrd_tag, test_set, lex 

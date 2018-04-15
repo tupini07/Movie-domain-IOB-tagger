@@ -20,8 +20,18 @@ def process_preds_to_score(score_file_name):
 
 
 def process_test_sentences(sentences, kind):
-    def process_test_sentence(sent):
+    """
+    Processes all test sentences with the model of type `kind` and saves the predictions
+    to a file
+    """
 
+    def process_test_sentence(sent):
+        """ 
+        Helper function that processes a test sentence indivivdually
+        """
+        
+        # create a transducer for the test sentence
+        # it transduces from word -> word
         with open("w/test_sent_fsa.txt", "w") as test_file:
             i = 0
 
@@ -31,7 +41,8 @@ def process_test_sentences(sentences, kind):
 
             test_file.write(f"{i}")
 
-        # complite the fst for the test sentence
+        # complite the fst for the test sentence and compute the predictions with the model we're testing. 
+        # finally save the predictions to a file
         call(f"fstcompile --isymbols=w/lex.syms --osymbols=w/lex.syms --keep_osymbols --keep_isymbols w/test_sent_fsa.txt | " +
              f"fstcompose - w/{kind}_wfst_ngrm.fsa | fstrmepsilon | fstshortestpath | fsttopsort | " +
              f"fstprint - " +
@@ -41,16 +52,21 @@ def process_test_sentences(sentences, kind):
         pd = pandas.read_csv(
             "w/prediction_on_sent.txt", delimiter="\t", header=None)
 
-        pd = pd[:-1][[2, 3]].get_values()
-        pd = [[w, re.sub(r"__.*", "", t)] for w, t in pd]
+        pd = pd[:-1][[2, 3]].get_values() # obtain only columns for word and tag (discard: id and weight columns)
+        pd = [[w, re.sub(r"__.*", "", t)] for w, t in pd] # replace the O__word tags with only O
 
-        return pd
+        return pd # return word and predicted tag
 
     ff = open("w/pred_coneval.txt", "w")
 
     for sent in tqdm(sentences): # tqdm provides nice progress bar
 
-        preds = process_test_sentence(sent)
+        preds = process_test_sentence(sent) # get dataframe representation of predictions
+
+        # appende predictions for specific sentence to the pred_coneval.txt file
+        # what we write is: word, correct-tag, predicted-tag
+        # which is the format accepted by the conlleval script. We separate the predictions for 
+        # each sentence with an empty line (the \n\n)
         ff.write("\n".join(
             w + " " + sent[i][1] + " " + p for i, (w, p) in enumerate(preds)) + "\n\n")
 
@@ -70,36 +86,28 @@ def process_score_files():
 
         return cnts
 
-    metrics_dict = {}
-    best_score = [None, None, 0]  # method, order, f1
 
     csv = "version,method,order,FB1,accuracy,precision,recall\n"
 
     for ff in os.listdir("scores/"):
 
-        if ff == "baseline.txt": 
+        if ff == "baseline.txt": # if the file we're processing is the baseline scores file
             version = "Baseline"
             method = "None"
             order = "1"
 
         else:
+            # extract information from filename
             match = re.search(r"(iob|iob_and_w)_method-(.*)_order-(.*).txt", ff)
 
-            version = match.group(1)
-            method = match.group(2)
-            order = match.group(3)
+            version = match.group(1) # iob or iob_and_w (basic or improved)
+            method = match.group(2) # smoothing method
+            order = match.group(3) # n-gram length
             
         metrics = extract_metrics_from_file(ff)
 
-        if best_score[2] < metrics["FB1"]:
-            best_score = [method, order, metrics["FB1"]]
-
+        # add information to a CSV file (so we can process it later on)
         csv += f"{version},{method},{order},{metrics['FB1']},{metrics['accuracy']},{metrics['precision']},{metrics['recall']}\n"
-
-        if not metrics_dict.get(method, False):
-            metrics_dict[method] = {}
-
-        metrics_dict[method][order] = metrics
 
     # save results in a CSV in case we want to process them later
     # with something else

@@ -6,12 +6,13 @@ from bash import call, draw, fstcompile
 def create_transducer_from_data(all_training_pairs, name):
     """
     `all_training_pairs` - is an array of pairs, where each pair is [word, tag]
+    `name` - is the name we want to give to the transducer
 
     The transducer is written to a file and then compiled with fstcompile
     """
 
     # first count occurrences of each word given the tag
-    cfd = nltk.ConditionalFreqDist(reversed(pair)  # tag - word (condition is tag)
+    cfd = nltk.ConditionalFreqDist( reversed(pair)  # tag - word (condition is tag)
                                    for pair in all_training_pairs)  # pair [word, tag]
 
     with open(f"w/{name}.txt", "w") as tagger_trans:
@@ -30,6 +31,7 @@ def create_transducer_from_data(all_training_pairs, name):
             # inverse log to respect the fact that weight is actually a score
             probab = -math.log(val / total_w)
 
+            # write transition rule to file
             tagger_trans.write(f"0\t0\t{word}\t{tag}\t{probab}\n")
 
         # Now we handle the probabilities for an unknown word
@@ -41,8 +43,10 @@ def create_transducer_from_data(all_training_pairs, name):
 
         tagger_trans.write("0")  # funally write a 0 at the end of the file
 
+    # finally we compile the file we just generated into a transducer
     call(
-        f"fstcompile --isymbols=w/lex.syms --osymbols=w/lex.syms --keep_osymbols --keep_isymbols w/{name}.txt | fstarcsort > w/{name}.fsa")
+        f"fstcompile --isymbols=w/lex.syms --osymbols=w/lex.syms --keep_osymbols --keep_isymbols w/{name}.txt | " +
+        f"fstarcsort > w/{name}.fsa")
 
 
 def create_baseline_model():
